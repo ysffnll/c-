@@ -1,0 +1,361 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+#include "Book.h"
+#include "BookStore.h"
+
+int main(){
+   BookStore bs;
+   
+   bs.addBook( "Tutunamayanlar", 40.50 );
+   bs.addBook( "Bir Gun Tek Basina", 34.99 );
+   bs.addBook( "Love in the Time of Cholera", 40 );
+   bs.addBook( "Die Blendung", 27.75 );
+    
+   bs["Bir Gun Tek Basina"].addEdition( 1974 );
+   bs["Bir Gun Tek Basina"].addEdition( 1998 );
+   bs["Bir Gun Tek Basina"].addEdition( 2007 );
+	
+   cin >> bs["Love in the Time of Cholera"];
+	
+   cout << endl << bs << endl;
+	
+   bs.removeBook( "Bir Gun Tek Basina" );
+   cout << bs << endl;
+	
+   try {
+      cin >> bs["The Little Prince"];
+   }
+   catch ( const exception& e ){
+      cout << e.what() << endl;
+   }
+   try {
+      bs.addBook( "Die Blendung", 50.45 );
+   }
+   catch ( const exception& e ){
+      cout << e.what() << endl;
+   }
+   try {
+      bs.removeBook( "The Waves" );
+   }
+   catch ( const exception& e ){
+      cout << e.what() << endl;
+   }
+   cout << endl;
+	
+   BookStore bs2(bs);
+   Book one( "The Catcher in the Rye", 20 );
+   bs2["Tutunamayanlar"] = one;
+	
+   cout << bs << endl;
+   cout << bs2 << endl;
+	
+   return 0;
+}
+
+
+
+#ifndef __BOOK_H
+#define __BOOK_H
+
+#include <string>
+using namespace std;
+
+class Book{
+public:
+   Book( const string bookTitle = "", const double bookPrice = 0 );
+   Book( const Book& bookToCopy );
+   ~Book();
+   Book& operator=( const Book& right );
+   void addEdition( const int newEditionYear );
+    
+private:
+   string title;        // Title of the book
+   double price;        // Price of the book
+   int editionNo;       // Number of the editions of the book
+   int* editionYears;   // A list of the years of the book's editions
+                        // Note that each book can have zero or more editions
+// BookStore class, which you will implement in Part B is declared as friend
+friend class BookStore;
+
+// Overloaded global functions for >> and << are declared as friend
+friend istream& operator>>( istream& in, Book& b );
+friend ostream& operator<<( ostream& out, const Book& b );
+};
+
+#endif
+
+#include <iostream>
+#include "Book.h"
+#include <cstdlib>
+
+using namespace std;
+
+Book::Book( const string bookTitle, const double bookPrice)
+{
+    title = bookTitle;
+    price = bookPrice;
+    editionNo = 0;
+    editionYears = NULL;
+}
+
+Book::~Book()
+{
+    if(editionYears != NULL)
+        delete[] editionYears;
+    editionYears = NULL;
+}
+
+Book::Book(const Book& bookToCopy )
+{
+    title = bookToCopy.title;
+    price = bookToCopy.price;
+    editionNo = bookToCopy.editionNo;
+    if(editionYears != NULL)
+        delete[] editionYears;
+    if(editionNo > 0)
+    {
+        editionYears = new int[editionNo];
+        for(int i = 0; i < editionNo; i++)
+            editionYears[i] = bookToCopy.editionYears[i];
+    }
+    else
+        editionYears = NULL;
+}
+
+Book& Book::operator=(const Book& right)
+{
+    title = right.title;
+    price = right.price;
+    editionNo = right.editionNo;
+    if(editionYears != NULL)
+        delete[] editionYears;
+    if(editionNo > 0)
+    {
+        editionYears = new int[editionNo];
+        for(int i = 0; i < editionNo; i++)
+            editionYears[i] = right.editionYears[i];
+    }
+    else
+        editionYears = NULL; 
+    return *this;
+}
+
+void Book::addEdition( const int newEditionYear )
+{
+    int *bE = new int[editionNo+1];
+    for(int i = 0; i < editionNo; i++)
+    {
+        bE[i] = editionYears[i];
+    }
+    bE[editionNo++] =  newEditionYear;
+    if(editionYears != NULL)
+        delete[] editionYears;
+    editionYears=NULL;
+    editionYears = bE;
+}
+
+std::ostream& operator<<(ostream& out, const Book& b)
+{
+    out << b.title << ", " << b.price <<" TL (" ;
+    if (b.editionNo == 0)
+        out << "none";
+    else
+    {
+        for(int i = 0; i < b.editionNo; i++)
+        {
+            out << b.editionYears[i];
+            if(i+1 < b.editionNo)
+                out << ", ";
+        }
+    }
+    out << ")";
+    return out;
+}
+
+std::istream& operator>>(istream& in, Book& b)
+{
+    std::cout << "Enter all edition years for " << b.title << ": " ;
+    if(b.editionYears != NULL)
+        delete[] b.editionYears;
+    b.editionYears = NULL;
+    b.editionNo = 0;
+    string input;
+    getline(in,input);
+    string prev = "a";
+    for (int i = 0; i < input.length(); i++)
+    {
+        if(i>0)
+            prev = input[i-1];
+        
+        if (input[i] <= 57 && input[i] >= 48 && prev[0] <= 57 && prev[0] >= 48)
+        {
+            int const newY = std::atoi((input.substr ((i-1),4)).c_str());
+            b.addEdition(newY);
+            i += 3;
+        }
+    }
+    return in;
+}
+
+
+
+#ifndef __BOOKSTORE_H
+#define __BOOKSTORE_H
+
+#include "Book.h"
+
+class BookStore{
+public:
+    BookStore();
+    BookStore( const BookStore& bsToCopy );
+    ~BookStore();
+    BookStore& operator=( const BookStore& right);
+    Book& operator[]( const string title);
+
+    void addBook( const string bookTitle, const double bookPrice );
+    void removeBook( const string bookTitle );
+    
+private:
+    Book* books;	// A dynamically created array of book objects
+    int bookNo;		// Number of the books in the bookstore system
+	
+// Overloaded global function for << is declared as friend
+friend ostream& operator<<( ostream& out, const BookStore& b );
+};
+
+#endif
+
+
+
+#include "BookStore.h"
+#include "iostream"
+#include <exception>
+
+BookStore::BookStore()
+{
+    books = NULL;
+    bookNo = 0;
+}
+
+BookStore::BookStore( const BookStore& bsToCopy )
+{
+    
+    if(bookNo != 0)
+        delete[] books;
+    bookNo = bsToCopy.bookNo; 
+    if(bookNo >0)
+    {
+        books = new Book[bookNo];
+        for(int i = 0; i < bookNo; i++)
+            books[i] = bsToCopy.books[i];
+    }
+    else
+        books = NULL;
+}
+
+BookStore::~BookStore()
+{
+    if(books != NULL)
+        delete[] books;
+    books = NULL;
+}
+
+BookStore& BookStore::operator=( const BookStore& right)
+{
+    if(bookNo != 0)
+        delete[] books;
+    bookNo = right.bookNo;
+    if(bookNo > 0)
+    {
+        books = new Book[bookNo];
+        for(int i = 0; i < bookNo; i++)
+            books[i] = right.books[i];
+    }
+    else
+        books = NULL;
+    return *this;
+}
+
+Book& BookStore::operator[]( const string title)
+{
+    for(int i=0; i<bookNo; i++)
+    {
+        if(title.compare(books[i].title)==0)
+            return books[i];
+    }
+    string exc = "Cannot access a non-existing book (" + title + ")";
+    throw runtime_error(exc);
+}
+
+void BookStore::addBook( const string bookTitle, const double bookPrice )
+{
+    bool control = true;
+    for(int i=0; i<bookNo; i++)
+    {
+        if(bookTitle.compare(books[i].title)==0)
+        {
+            string exc = "Cannot add an already existing book (" + bookTitle + ")";
+            throw runtime_error(exc);
+            control = false;    //mnngls
+        }
+    }
+    if(control)
+    {
+        Book *newList = new Book[bookNo+1];
+        for(int i = 0; i < bookNo; i++)
+            newList[i] = books[i];
+        Book newBook (bookTitle,bookPrice);
+        newList[bookNo++] =  newBook;
+        if(books != NULL) 
+            delete []books;
+        books=NULL;
+        books = newList;
+    }
+}
+
+void BookStore::removeBook( const string bookTitle )
+{
+    bool control = false;
+    int indexOfBook = 0;
+    for(int i=0; i<bookNo; i++)
+    {
+        if(bookTitle.compare(books[i].title)==0)
+        {
+            control = true;
+            indexOfBook = i;
+        }
+    }
+    if(control)
+    {
+        Book *newList = new Book[bookNo - 1];
+        for(int i = 0; i < bookNo - 1; i++)
+        {
+            if(i >= indexOfBook)
+                newList[i] = books[i+1];
+            else
+                newList[i] = books[i];
+        }
+        if(books != NULL) 
+            delete[]books;
+        books=NULL;
+        books = newList;
+        bookNo--;
+    }
+    else
+    {
+        string exc = "Cannot remove a non-existing book (" + bookTitle + ")";
+        throw runtime_error(exc);
+    }
+}
+
+std::ostream& operator<<( ostream& out, const BookStore& b )
+{
+    for(int i = 0; i < b.bookNo; i++)
+    {
+        out << b.books[i];
+        out << std::endl;
+    }
+    return out;
+}
