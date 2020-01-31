@@ -1,0 +1,504 @@
+#include <iostream>
+#include "LibrarySystem.h"
+using namespace std;
+
+int main() {
+    LibrarySystem LibraryTest;
+    LibraryTest.addBook( 2000, "Dispossessed", 2017 );
+    LibraryTest.deleteBook( 2000 );
+    LibraryTest.showAllBooks();
+    LibraryTest.addBook( 2000, "Dispossessed", 2017 );
+    LibraryTest.addBook( 1453, "Martin Eden", 2015 );
+    LibraryTest.deleteBook( 1453 );
+    LibraryTest.showAllBooks();
+    LibraryTest.addBook( 1453, "Martin Eden", 2015 );
+    LibraryTest.addBook( 1300, "Sefiller", 2015 );
+    LibraryTest.addBook( 1453, "Martin Eden", 2015 );
+    LibraryTest.showAllBooks();
+    LibraryTest.deleteBook( 1300 );
+    LibraryTest.showAllBooks();
+    LibraryTest.addBook( 1300, "Sefiller", 2015 );
+    LibraryTest.showAllBooks();
+    LibraryTest.deleteBook( 2000 );
+    LibraryTest.showAllBooks();
+    LibraryTest.addBook( 1500, "Metamorphose", 2000 );
+    
+    cout << endl;
+    LibraryTest.addStudent( 21401524, "Yusuf Unlu" );
+    LibraryTest.deleteStudent( 21401524 );
+    LibraryTest.addStudent( 21401524, "Yusuf Unlu" );
+    LibraryTest.addStudent( 21900011, "Aynur Dayanik" );
+    LibraryTest.deleteStudent( 21401524 );
+    LibraryTest.addStudent( 21401524, "Yusuf Unlu" );
+    LibraryTest.deleteStudent( 21401524 );
+    LibraryTest.addStudent( 21401524, "Yusuf Unlu" );
+    LibraryTest.deleteStudent( 21900011 );
+    LibraryTest.addStudent( 21900011, "Aynur Dayanik" );
+    LibraryTest.addStudent( 21900011, "Cigdem Gunduz Demir" );
+    LibraryTest.deleteStudent( 21900011 );
+    LibraryTest.addStudent( 21900011, "Aynur Dayanik" );
+    LibraryTest.addStudent( 21502502, "Alihan Kocoglu" );
+    LibraryTest.addStudent( 21900001, "Timur Parmaksız" );
+    LibraryTest.addStudent( 21400491, "Oguzhan Ayla" );
+    LibraryTest.deleteStudent( 21900011 );
+    LibraryTest.deleteStudent( 21900050 );
+    cout << endl;
+    LibraryTest.checkoutBook( 1453, 21401524 );
+    LibraryTest.checkoutBook( 1400, 21502502 );
+    LibraryTest.addBook( 1400, "C++ How to not Programing", 2016 );
+    LibraryTest.deleteBook( 1300 );
+    LibraryTest.addBook( 1400, "C++ How to not Programing", 2016 );
+    LibraryTest.checkoutBook( 2050, 21900011 );
+    LibraryTest.showStudent( 21900011 );
+    LibraryTest.checkoutBook( 2000, 21900444 );
+    LibraryTest.showStudent( 21900444 );
+    LibraryTest.checkoutBook( 1500, 21401524 );
+    LibraryTest.checkoutBook( 1400, 21900001 );
+    LibraryTest.showStudent( 21900001 );
+    cout << endl;
+    LibraryTest.showStudent( 21401524 );
+    cout << endl;
+    LibraryTest.showStudent( 21400491 );
+    cout << endl;
+    LibraryTest.showStudent( 21900011 );
+    cout << endl;
+    LibraryTest.showBook( 2000 );
+    LibraryTest.showBook( 1453 );
+    cout << endl;
+    LibraryTest.showAllBooks();
+    cout << endl;
+    LibraryTest.returnBook( 1453 );
+    LibraryTest.returnBook( 2000 );
+    LibraryTest.checkoutBook( 1453, 21502502 );
+    LibraryTest.returnBook( 2000 );
+    cout << endl;
+    LibraryTest.checkoutBook( 1453, 21502502 );
+    LibraryTest.showAllBooks();
+    LibraryTest.checkoutBook( 1453, 21502502 );
+    LibraryTest.showAllBooks();
+    LibraryTest.checkoutBook( 2000, 21401524 );
+    cout << endl;
+    LibraryTest.showAllBooks();
+    cout << endl;
+    LibraryTest.deleteStudent( 21502502 );
+    LibraryTest.showStudent( 21502502 );
+    cout << endl;
+    LibraryTest.showStudent( 21401524 );
+    cout << endl;
+    LibraryTest.deleteBook( 2000 );
+    cout << endl;
+    LibraryTest.showStudent( 21401524 );
+    cout << endl;
+    LibraryTest.showAllBooks();
+    return 0;
+}
+
+
+
+
+
+#ifndef LIBRARYSYSTEM_H
+#define LIBRARYSYSTEM_H
+
+#include <string>
+using namespace std;
+
+class LibrarySystem
+{
+public:
+    LibrarySystem();
+    ~LibrarySystem();
+    void addBook( const int bookId, const string name, const int year );
+    void deleteBook( const int bookId );
+    void addStudent( const int studentId, const string name );
+    void deleteStudent( const int studentId );
+    void checkoutBook( const int bookId, const int studentId );
+    void returnBook( const int bookId );
+    void showAllBooks();
+    void showBook( const int bookId );
+    void showStudent( const int studentId );
+private:
+    struct BooksofStudent {
+        int ID;
+        string title;
+        int year;
+        BooksofStudent* next;
+    };
+    struct Students {
+        int ID;
+        string name;
+        Students* next;
+        BooksofStudent* StudentBooks;
+    };
+    struct Books {
+        int ID;
+        string title;
+        int year;
+        bool isCheckOut;
+        int student_ID;
+        Books* next;
+    };
+    Students *StudentsHead;
+    Books *BooksHead;
+    Books* findBook( int id );
+    Students* findStudent( int id );
+    BooksofStudent* findStudentBook( int bookID, int studentID );
+    void deleteStudentBook( int BookID, int StudentID );
+};
+
+#endif // LIBRARYSYSTEM_H
+
+
+
+
+
+
+
+#include "LibrarySystem.h"
+
+#include <iostream>
+#include <iomanip>
+
+LibrarySystem::LibrarySystem():StudentsHead(NULL),BooksHead(NULL)
+{
+}
+
+LibrarySystem::~LibrarySystem()
+{
+    while(StudentsHead != NULL)
+    {
+        while(StudentsHead->StudentBooks != NULL)
+        {
+            BooksofStudent *del = StudentsHead->StudentBooks;
+            StudentsHead->StudentBooks = StudentsHead->StudentBooks->next;
+            del->next = NULL;
+            delete del;
+            del = NULL;
+        }
+        Students *del = StudentsHead;
+        StudentsHead = StudentsHead->next;
+        del->next = NULL;
+        delete del;
+        del = NULL;
+    }
+    while(BooksHead!= NULL)
+    {
+        Books *del = BooksHead;
+        BooksHead =BooksHead->next;
+        del->next = NULL;
+        delete del;
+        del = NULL;
+    }
+}
+
+void LibrarySystem::addBook( const int bookId, const string name, const int year )
+{
+    if(findBook(bookId) != NULL)
+        cout<< "Book " << bookId <<" already exists" << endl;
+    else
+    {
+        Books *newBook = new Books;
+        newBook->ID = bookId;
+        newBook->title = name;
+        newBook->year = year;
+        newBook->isCheckOut = false;
+        newBook->next = BooksHead; //circular
+        if (BooksHead == NULL)
+        {
+            newBook->next = newBook;
+            BooksHead = newBook;
+        }
+        else
+        {
+            Books *srcPtr = BooksHead;
+            while (srcPtr->next != BooksHead)
+                srcPtr = srcPtr->next;
+            srcPtr->next = newBook;
+        }
+        cout<< "Book " << bookId <<" has been added" << endl;
+    }
+}
+
+void LibrarySystem::deleteBook( const int bookId )
+{
+    if(findBook(bookId) == NULL)
+    {
+        cout<< "Book " << bookId <<" does not exist" << endl;
+        return;
+    }
+    Books* srcPtr = findBook(bookId);
+    if(srcPtr->isCheckOut == true)
+        returnBook(bookId);
+    else
+        cout<< "Book " << bookId <<" has not been checked out" << endl;
+    Books* prev = srcPtr->next;
+    while (prev->next != srcPtr)  
+        prev = prev->next;
+    
+    if(srcPtr == BooksHead && prev == BooksHead)
+        BooksHead = NULL;
+    else if (srcPtr == BooksHead)
+    {
+        prev->next = srcPtr->next;
+        BooksHead = srcPtr->next;
+    }
+    else if (srcPtr -> next == BooksHead)
+        prev->next = BooksHead;
+    else
+        prev->next = srcPtr->next;
+    srcPtr->next = NULL;
+    delete srcPtr;
+    srcPtr = NULL;
+    cout<< "Book " << bookId <<" has been deleted" << endl;
+}
+
+void LibrarySystem::addStudent( const int studentId, const string name )
+{
+    if(findStudent(studentId) != NULL)
+        cout<< "Student " << studentId <<" already exists" << endl;
+    else
+    {
+        Students *newStudent = new Students;
+        newStudent->ID = studentId;
+        newStudent->name = name;
+        newStudent->StudentBooks = NULL;
+        newStudent->next = StudentsHead; //circular
+        if (StudentsHead == NULL)
+        {
+            newStudent->next = newStudent;
+            StudentsHead = newStudent;
+        }
+        else
+        {
+            Students *srcPtr = StudentsHead;
+            while (srcPtr->next != StudentsHead)
+                srcPtr = srcPtr->next;
+            srcPtr->next = newStudent;
+        }
+        cout<< "Student " << studentId <<" has been added" << endl;
+    }
+}
+
+void LibrarySystem::deleteStudent( const int studentId )
+{
+    Students* srcPtr = findStudent(studentId);
+    if(srcPtr == NULL)
+    {
+        cout<< "Student " << studentId <<" does not exist" << endl;
+        return;
+    }
+    while(srcPtr->StudentBooks != NULL)
+        returnBook((srcPtr->StudentBooks)->ID);
+    Students* prev = srcPtr->next;
+    while (prev->next != srcPtr)
+        prev = prev->next;
+    if(srcPtr == StudentsHead && prev == StudentsHead)
+        StudentsHead = NULL;
+    else if (srcPtr == StudentsHead)
+    {
+        prev->next = srcPtr->next;
+        StudentsHead = srcPtr->next;
+    }
+    else if (srcPtr -> next == StudentsHead)
+        prev->next = StudentsHead;
+    else
+        prev->next = srcPtr->next;
+    srcPtr->next = NULL;
+    delete srcPtr;
+    srcPtr = NULL;
+    cout<< "Student " << studentId <<" has been deleted" << endl;
+}
+
+void LibrarySystem::checkoutBook( const int bookId, const int studentId )
+{
+    if (findBook(bookId) ==NULL)
+    {
+        cout<< "Book " << bookId <<" does not exist for checkout" << endl;
+        return;
+    }
+    else if (findStudent(studentId) ==NULL)
+    {
+        cout<< "Student " << studentId <<" does not exist for checkout" << endl;
+        return;
+    }
+    else if(findBook(bookId)->isCheckOut == true)
+    {
+        cout<< "Book " << bookId <<" has been already checked out by another student" << endl;
+        return;
+    }
+    Students *Scur = findStudent(studentId);
+    Books *Bcur = findBook(bookId);
+    Bcur->isCheckOut = true;
+    Bcur->student_ID = studentId;
+    BooksofStudent *newCheckout = new BooksofStudent;
+    newCheckout->ID = bookId;
+    newCheckout->title = Bcur->title;
+    newCheckout->year = Bcur->year;
+    newCheckout->next = Scur->StudentBooks; //circular
+    if (Scur->StudentBooks == NULL)
+    {
+        newCheckout->next = newCheckout;
+        Scur->StudentBooks = newCheckout;
+    }
+    else
+    {
+        BooksofStudent *srcPtr = Scur->StudentBooks;
+        while (srcPtr->next != Scur->StudentBooks)
+            srcPtr = srcPtr->next;
+        srcPtr->next = newCheckout;
+    }
+    cout<< "Book " << bookId << " has been checked out by student " << studentId << endl;
+}
+
+void LibrarySystem::returnBook( const int bookId )
+{
+    Books *cur = findBook(bookId);
+    if(cur == NULL)
+        cout<< "Book " << bookId <<" does not exist" << endl;
+    else
+    {
+        if(cur->isCheckOut == true)
+        {
+            cout<< "Book " << bookId <<" has been returned" << endl;
+            deleteStudentBook(bookId, cur->student_ID);
+            cur->isCheckOut=false;
+        }
+        else
+            cout<< "Book " << bookId <<" has not been checked out" << endl;
+    }
+}
+
+void LibrarySystem::showAllBooks()
+{
+    Books* cur = BooksHead;
+    if(cur==NULL)
+        cout<<"Library has no book" << endl;
+    else
+    {
+        cout<<"Book id"<<setw(15-7+9)<<"Book name"<<setw(25-9+4)<<"Year"<<"     Status" <<endl;
+        do
+        {
+            showBook(cur->ID);
+            cur = cur -> next;
+        }while (cur != BooksHead);
+    }
+}
+
+void LibrarySystem::showBook( const int bookId )
+{
+    Books *book = (findBook(bookId));
+    if(book != NULL)
+    {
+        int first_space = 15-4+book->title.size();
+        int second_space = 25-book->title.size()+4;//4 is year length
+        if(book->isCheckOut==true)
+            cout<<book->ID<<setw(first_space)<<book->title<<setw(second_space)<<book->year<<"     "<<"Checked out by student "<<book->student_ID<<endl;
+        else
+            cout<<book->ID<<setw(first_space)<<book->title<<setw(second_space)<<book->year<<"     "<<"Not checked out"<<endl;
+    }
+    else
+        cout<<"Book "<< bookId << " does not exist" << endl;
+}
+
+void LibrarySystem::showStudent( const int studentId )
+{
+    Students* cur = findStudent(studentId);
+    if(cur==NULL)
+        cout<<"Student "<< studentId << " does not exist" << endl;
+    else
+    {
+        cout<<"Student id: "<< studentId << " student name: "<< cur->name << endl;
+        if(cur->StudentBooks==NULL)
+            cout<<"Student "<< studentId << " has no books" << endl;
+        else
+        {
+            cout<<"Student "<< studentId << " has checked out the following books:" << endl;
+            cout<<"Book id"<<setw(15-7+9)<<"Book name"<<setw(25-9+4)<<"Year"<<endl; 
+            BooksofStudent* book = cur->StudentBooks;
+            do
+            {
+                int first_space = 15-4+book->title.size();
+                int second_space = 25-book->title.size()+4;//4 is year length
+                cout<<book->ID<<setw(first_space)<<book->title<<setw(second_space)<<book->year<<endl;
+                book = book -> next;
+            }while (book != cur->StudentBooks);
+        }
+    }
+}
+
+LibrarySystem::Books*  LibrarySystem::findBook( int id )
+{
+    if(BooksHead != NULL)
+    {
+        Books *srcPtr = BooksHead;
+        do
+        {
+            if(srcPtr->ID == id)
+                return srcPtr;
+            else
+                srcPtr = srcPtr->next;
+        }while(srcPtr != BooksHead);
+    }
+    return NULL;
+}
+
+LibrarySystem::Students*  LibrarySystem::findStudent( int id )
+{
+    if(StudentsHead != NULL)
+    {
+        Students* srcPtr = StudentsHead;
+        do
+        {
+            if(srcPtr->ID == id)
+                return srcPtr;
+            else
+                srcPtr = srcPtr->next;
+        }while(srcPtr != StudentsHead);
+    }
+    return NULL;
+}
+
+void LibrarySystem::deleteStudentBook( int BookID, int StudentID )
+{
+    Students* student = findStudent(StudentID);
+    BooksofStudent* srcPtr = findStudentBook(BookID, StudentID);
+    if(srcPtr == NULL)
+        return;
+    BooksofStudent* prev = srcPtr->next;
+    while (prev->next != srcPtr)  
+        prev = prev->next;
+    if(srcPtr == student->StudentBooks && prev == student->StudentBooks)
+        student->StudentBooks = NULL;
+    else if (srcPtr == student->StudentBooks)
+    {
+        prev->next = srcPtr->next;
+        student->StudentBooks = srcPtr->next;
+    }
+    else if (srcPtr -> next == student->StudentBooks)
+        prev->next = student->StudentBooks;
+    else
+        prev->next = srcPtr->next;
+    srcPtr->next = NULL;
+    delete srcPtr;
+    srcPtr = NULL;
+}
+
+LibrarySystem::BooksofStudent* LibrarySystem::findStudentBook( int bookID, int studentID )
+{
+    if( findStudent( studentID ) == NULL || findBook(bookID) == NULL )
+        return NULL;
+    Students* stu = findStudent( studentID );
+    if(stu->StudentBooks != NULL)
+    {
+        BooksofStudent* srcPtr = stu->StudentBooks;
+        do
+        {
+            if(srcPtr->ID == bookID)
+                return srcPtr;
+            else
+                srcPtr = srcPtr->next;
+        }while(srcPtr != stu->StudentBooks);
+    }
+    return NULL;
+}
+
