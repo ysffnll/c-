@@ -1,0 +1,191 @@
+#include <iostream>
+#include <stdio.h>
+#include <vector>
+#include <ctime>
+
+using namespace std;
+
+long f1(const vector<long>&);
+long f2(const vector<long>&);
+long f3(const vector<long>&);
+long f4(const vector<long>&);
+long maxSumRec(const vector<long>&,long,long);
+long max3(long,long,long);
+
+//main
+int main()
+{
+    long size = 100;
+    while (size<=1000){
+        vector<long> a(size, 5);
+        //Store the starting time
+        double duration;
+        clock_t startTime = clock();
+        //Code block
+        long result = f1(a);
+        //Compute the number of seconds that passed since the starting time
+        duration = 1000 * double( clock() - startTime ) / CLOCKS_PER_SEC;
+        cout << "Execution took ______" << duration << "_______ milliseconds. 11111 *** size = " <<  size << endl;
+        size += 100;
+    }
+    cout << "_______________________________________" << endl;
+    size = 1000;
+    while (size<=10000){
+        vector<long> a(size, 5);
+        //Store the starting time
+        double duration;
+        clock_t startTime = clock();
+        //Code block
+        long result = f2(a);
+        //Compute the number of seconds that passed since the starting time
+        duration = 1000 * double( clock() - startTime ) / CLOCKS_PER_SEC;
+        cout << "Execution took ______" << duration << "_______ milliseconds. 22222 *** size = " <<  size << endl;
+        size += 1000;
+    }
+    cout << "_______________________________________" << endl;
+    size = 100000;
+    while (size<=1000000){
+        vector<long> a(size, 5);
+        // Declare necessary variables
+        double duration;
+        clock_t startTime = clock();
+        //Code block
+        long result = f3(a);
+        //Compute the number of seconds that passed since the starting time
+        duration = 1000 * double( clock() - startTime ) / CLOCKS_PER_SEC;
+        cout << "Execution took ______" << duration << "_______ milliseconds. 33333 *** size = " <<  size << endl;
+        size += 100000;
+    }
+    cout << "_______________________________________" << endl;
+    size = 10000000;
+    while (size<=100000000){
+        vector<long> a(size, 5);
+        //Store the starting time
+        double duration;
+        clock_t startTime = clock();
+        //Code block
+        long result = f4(a);
+        //Compute the number of seconds that passed since the starting time
+        duration = 1000 * double( clock() - startTime ) / CLOCKS_PER_SEC;
+        cout << "Execution took ______" << duration << "_______ milliseconds. 44444 *** size = " <<  size << endl;
+        size += 10000000;
+    }
+	return 0;
+}
+
+/*
+ * Cubic maximum contiguous subsequence sum algorithm.
+ */
+long f1(const vector<long> & a){
+    long maxSum = 0;
+
+    for(long i=0; i< a.size(); i++)
+    {
+        for(long j=i; j< a.size(); j++)
+        {
+            long thisSum = 0;
+            for(long k = i; k<=j; k++)
+                thisSum += a[k];
+            if(thisSum > maxSum)
+                maxSum = thisSum;
+        }
+    }
+    return maxSum;
+}
+
+/*
+ * Quadratic maximum contiguous subsequence sum algorithm.
+ */
+long f2(const vector<long> & a){
+    long maxSum = 0;
+    
+    for(long i=0; i< a.size(); i++)
+    {
+        long thisSum = 0;
+        for(long j=i; j< a.size(); j++)
+        {
+            thisSum += a[j];
+            if(thisSum > maxSum)
+                maxSum = thisSum;
+        }
+    }
+    return maxSum;
+}
+
+/*
+ * Recursive maximum cantiguous subsequence sum algorithm.
+ * Finds maximum sum in subarray spanning a[left..right].
+ * Does not attempt to maintain acrual best squence.
+ */
+long maxSumRec(const vector<long> & a, long left, long right){
+    if (left == right) //base case
+    {
+        if(a[left]>0)
+            return a[left];
+        else
+            return 0;
+    }
+    long center = (left+right)/2;
+    
+    long maxLeftSum = maxSumRec(a,left,center);
+    long maxRightSum = maxSumRec(a,center+1,right);
+
+    long maxLeftBorderSum = 0, leftBorderSum = 0;
+    for(long i = center; i>=left; i--)
+    {
+        leftBorderSum += a[i];
+
+        if(leftBorderSum > maxLeftBorderSum)
+            maxLeftBorderSum = leftBorderSum;
+    }
+    
+    long maxRightBorderSum = 0, rightBorderSum = 0;
+    for(long i = center; i<=right; i++)
+    {
+        rightBorderSum += a[i];
+        if(rightBorderSum > maxRightBorderSum)
+            maxRightBorderSum = rightBorderSum;
+    }
+    return max3(maxLeftSum,maxRightSum,maxLeftBorderSum+maxRightBorderSum);
+}
+
+//support methods for f3
+long max3(long a, long b, long c)
+{
+    if(a > b)
+    {
+        if(a > c)
+            return a;
+    }
+    else if(b > a)
+    {
+        if(b > c)
+            return b; // return instead of cout
+    }
+    else if(c>b)
+    {
+        if(c>a)
+            return c;
+    }
+}
+long f3(const vector<long> & a)
+{
+    return maxSumRec(a,0,a.size()-1);
+}
+
+/*
+ * Linear-time maximum contiguous subsequence sum algorithm.
+ */
+long f4(const vector<long> & a){
+    long maxSum = 0,thisSum = 0;
+    
+    for(long i=0; i< a.size(); i++)
+    {
+        thisSum += a[i];
+        if(thisSum > maxSum)
+            maxSum = thisSum;
+        else if(thisSum < 0)
+            thisSum=0;
+    }
+    return maxSum;
+}
